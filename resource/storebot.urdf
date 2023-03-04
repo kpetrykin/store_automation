@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<robot name="Storebot">
+    <webots>
+        <plugin type="store_automation.storebot_driver.StorebotDriver" />
+    </webots>
+</robot>
