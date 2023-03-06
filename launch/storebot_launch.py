@@ -3,6 +3,7 @@ import pathlib
 import launch
 from launch_ros.actions import Node
 from launch import LaunchDescription
+from launch.substitutions import Command, LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 from webots_ros2_driver.webots_launcher import WebotsLauncher, Ros2SupervisorLauncher
 from webots_ros2_driver.utils import controller_url_prefix
@@ -10,7 +11,13 @@ from webots_ros2_driver.utils import controller_url_prefix
 
 def generate_launch_description():
     package_dir = get_package_share_directory('store_automation')
-    robot_description = pathlib.Path(os.path.join(package_dir, 'resource', 'storebot.urdf')).read_text()
+    
+    default_model_path = os.path.join(package_dir, 'resource', 'storebot.urdf')
+    robot_description = pathlib.Path(default_model_path).read_text()
+    
+    print('DEFAULT_MODEL_PATH: ', default_model_path)
+    
+    default_rviz_config_path = os.path.join(package_dir, 'rviz/urdf_config.rviz')
 
     webots = WebotsLauncher(
         world=os.path.join(package_dir, 'worlds', 'store.wbt'),
@@ -30,7 +37,35 @@ def generate_launch_description():
         package='tf2_ros',
         executable='static_transform_publisher',
         output='screen',
-        arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'lidar'],
+        arguments=['0', '0', '0', '0', '0', '0', 'base_link', 'base_link_footprint'],
+    )
+    
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        parameters=[{'robot_description': Command(['xacro ', LaunchConfiguration('model')])}]
+    )
+    
+    joint_state_publisher_node = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher',
+        condition=launch.conditions.UnlessCondition(LaunchConfiguration('gui'))
+    )
+    
+    joint_state_publisher_gui_node = Node(
+        package='joint_state_publisher_gui',
+        executable='joint_state_publisher_gui',
+        name='joint_state_publisher_gui',
+        condition=launch.conditions.IfCondition(LaunchConfiguration('gui'))
+    )
+    
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', LaunchConfiguration('rvizconfig')],
     )
 
     return LaunchDescription([
@@ -42,5 +77,16 @@ def generate_launch_description():
                 target_action=webots,
                 on_exit=[launch.actions.EmitEvent(event=launch.events.Shutdown())],
             )
-        )
+        ),
+        
+        launch.actions.DeclareLaunchArgument(name='gui', default_value='False',
+                                            description='Flag to enable joint_state_publisher_gui'),
+        launch.actions.DeclareLaunchArgument(name='model', default_value=default_model_path,
+                                            description='Absolute path to robot urdf file'),
+        launch.actions.DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
+                                            description='Absolute path to rviz config file'),
+        joint_state_publisher_node,
+        joint_state_publisher_gui_node,
+        robot_state_publisher_node,
+        rviz_node
     ])
