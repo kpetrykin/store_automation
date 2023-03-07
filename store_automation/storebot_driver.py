@@ -17,23 +17,27 @@ class StorebotDriver:
         self.__right_motor.setPosition(float('inf'))
         self.__right_motor.setVelocity(0)
 
-        self.__target_twist = Twist()
-
         rclpy.init(args=None)
         self.__node = rclpy.create_node('storebot_driver')
         self.__node.create_subscription(Twist, 'cmd_vel', self.__cmd_vel_callback, 1)
+        
+    def step(self):
+        rclpy.spin_once(self.__node, timeout_sec=0)
 
     def __cmd_vel_callback(self, twist):
-        forward_speed = twist.linear.x
-        angular_speed = twist.angular.z
+        linear_vel = twist.linear.x
+        angular_vel = twist.angular.z
 
-        command_motor_left = (forward_speed - angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
-        command_motor_right = (forward_speed + angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
+        command_motor_left = self.__calc_motor_velocity(linear_vel, angular_vel, motor='left')
+        command_motor_right = self.__calc_motor_velocity(linear_vel, angular_vel, motor='right')
 
         self.__left_motor.setVelocity(command_motor_left)
         self.__right_motor.setVelocity(command_motor_right)
 
-    def step(self):
-        rclpy.spin_once(self.__node, timeout_sec=0)
+    def __calc_motor_velocity(self, linear_vel, angular_vel, motor='left'):
+        if motor == 'left':
+            angular_vel *= -1
+
+        return (linear_vel + angular_vel * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
         
         
