@@ -12,8 +12,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.1294283274145016 0.6360783293082533 -0.7606922288594158 0.5227225037056957
-  position -7.75725318050474 -0.18776914323964133 2.6281297044467173
+  orientation -0.04884128150183199 0.4076485990377393 0.9118317547244267 0.26135551923442907
+  position -5.024690301500042 -2.4948333642436338 0.22106708170634576
 }
 TexturedBackground {
 }
@@ -45,6 +45,9 @@ Robot {
   translation -3.737618596896735 -2.2188264623925864 0.2703307274267447
   rotation -0.00175428527766837 0.0023365331619289516 -0.999995731538864 -0.35591785084433614
   children [
+    DEF IMU InertialUnit {
+      name "imu"
+    }
     Lidar {
       translation 0 0 0.12
       rotation 0 0 1 -1.5707953071795862
@@ -58,6 +61,9 @@ Robot {
         anchor -0.347 0 -0.18
       }
       device [
+        PositionSensor {
+          name "right_encoder"
+        }
         RotationalMotor {
           name "right_motor"
           maxTorque 200
@@ -218,6 +224,9 @@ Robot {
         anchor 0.353 0 -0.18
       }
       device [
+        PositionSensor {
+          name "left_encoder"
+        }
         RotationalMotor {
           name "left_motor"
           maxTorque 200
