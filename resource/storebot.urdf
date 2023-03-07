@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="Storebot" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="/memristor/Documents/storebot.urdf" xmlns:xacro="http://ros.org/wiki/xacro">
     <link name="base_link">
         <visual>
             <origin xyz="-0.24 -0.01 -0.14" rpy="0 0 0" />
@@ -293,6 +293,14 @@
         <child link="lidar" />
         <origin xyz="-0.0001 0 0.12" rpy="0 0 -1.570795" />
     </joint>
+    <link name="imu">
+    </link>
+    <joint name="base_link_imu_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="imu" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
     <webots>
         <plugin type="store_automation.storebot_driver.StorebotDriver" />
     </webots>
