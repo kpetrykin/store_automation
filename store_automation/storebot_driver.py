@@ -2,7 +2,7 @@ import rclpy
 from geometry_msgs.msg import Twist
 
 HALF_DISTANCE_BETWEEN_WHEELS = 0.35
-WHEEL_RADIUS = 0.25
+WHEEL_RADIUS = 0.11
 
 class StorebotDriver:
     def init(self, webots_node, properties):
@@ -24,16 +24,16 @@ class StorebotDriver:
         self.__node.create_subscription(Twist, 'cmd_vel', self.__cmd_vel_callback, 1)
 
     def __cmd_vel_callback(self, twist):
-        self.__target_twist = twist
-
-    def step(self):
-        rclpy.spin_once(self.__node, timeout_sec=0)
-
-        forward_speed = self.__target_twist.linear.x
-        angular_speed = self.__target_twist.angular.z
+        forward_speed = twist.linear.x
+        angular_speed = twist.angular.z
 
         command_motor_left = (forward_speed - angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
         command_motor_right = (forward_speed + angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
 
         self.__left_motor.setVelocity(command_motor_left)
         self.__right_motor.setVelocity(command_motor_right)
+
+    def step(self):
+        rclpy.spin_once(self.__node, timeout_sec=0)
+        
+        
