@@ -1,9 +1,10 @@
-from math import sin, cos
+from math import sin, cos, isnan
 from typing import Tuple
 from rclpy.time import Time
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TransformStamped, Quaternion
 from tf2_ros import TransformBroadcaster
+from rclpy import logging
 
 import tf_transformations
 
@@ -20,17 +21,23 @@ class OdomHandler:
         self._odometry_frame = 'odom'
         self._robot_base_frame = 'base_link'
 
-        self._reset_odometry()
         self._left_encoder = self._robot.getDevice('left_encoder')
         self._right_encoder = self._robot.getDevice('right_encoder')
         self._left_encoder.enable(ENCODER_TIMESTEP)
         self._right_encoder.enable(ENCODER_TIMESTEP)
+        self._left_encoder_startup_offset = None
+        self._right_encoder_startup_offset = None
+
         self._odometry_publisher = self._ros_node.create_publisher(
             Odometry, '/odom', 1)
         self._tf_broadcaster = TransformBroadcaster(self._ros_node)
 
-        # Initialize timer
+        # Initialize "prev" variables
         self._last_odometry_sample_time = self._robot.getTime()
+        self._prev_left_wheel_ticks = 0
+        self._prev_right_wheel_ticks = 0
+        self._prev_position = (0.0, 0.0)
+        self._prev_angle = 0.0
 
     def publish_odometry(self) -> None:
         timestamp = Time(seconds=self._robot.getTime()).to_msg()
@@ -42,23 +49,42 @@ class OdomHandler:
         left_wheel_ticks = self._left_encoder.getValue()
         right_wheel_ticks = self._right_encoder.getValue()
 
+        # For some reason we have 'nan' in several first encoder values
+        if not isnan(left_wheel_ticks):
+            if self._left_encoder_startup_offset is None:
+                self._left_encoder_startup_offset = left_wheel_ticks
+        else:
+            return
+
+        if not isnan(right_wheel_ticks):
+            if self._right_encoder_startup_offset is None:
+                self._right_encoder_startup_offset = left_wheel_ticks
+        else:
+            return
+
+        left_wheel_ticks -= self._left_encoder_startup_offset
+        right_wheel_ticks -= self._right_encoder_startup_offset
+
         v, omega = self._calculate_velocities(
             left_wheel_ticks, right_wheel_ticks, time_diff_s)
-        position, orientation = self._calculate_position_and_orientation(
-            v, omega, time_diff_s)
 
-        # Update variables
-        self._prev_position = position.copy()
-        self._prev_angle = orientation
-        self._prev_left_wheel_ticks = left_wheel_ticks
-        self._prev_right_wheel_ticks = right_wheel_ticks
-        self._last_odometry_sample_time = self._robot.getTime()
+        if not isnan(v):
+            position, orientation = self._calculate_position_and_orientation(
+                v, omega, time_diff_s)
 
-        self._publish_tf_odom_base_link(timestamp, position, orientation)
-        self._publish_odom_navmsg(timestamp, v, omega, position, orientation)
+            # Update variables
+            self._prev_position = position.copy()
+            self._prev_angle = orientation
+            self._prev_left_wheel_ticks = left_wheel_ticks
+            self._prev_right_wheel_ticks = right_wheel_ticks
+            self._last_odometry_sample_time = self._robot.getTime()
 
-    def _calculate_velocities(self, left_wheel_ticks: int,
-                              right_wheel_ticks: int, time_diff_s: int) -> Tuple[float, float]:
+            self._publish_tf_odom_base_link(timestamp, position, orientation)
+            self._publish_odom_navmsg(
+                timestamp, v, omega, position, orientation)
+
+    def _calculate_velocities(self, left_wheel_ticks: float,
+                              right_wheel_ticks: float, time_diff_s: float) -> Tuple[float, float]:
         v_left_rad = (left_wheel_ticks -
                       self._prev_left_wheel_ticks) / time_diff_s
         v_right_rad = (right_wheel_ticks -
@@ -70,7 +96,7 @@ class OdomHandler:
 
         return v, omega
 
-    def _calculate_position_and_orientation(self, v: float, omega: float, time_diff_s: int) -> Tuple[float, float]:
+    def _calculate_position_and_orientation(self, v: float, omega: float, time_diff_s: float) -> Tuple[float, float]:
         # Fourth order Runge - Kutta
         # Reference: https://www.cs.cmu.edu/~16311/s07/labs/NXTLabs/Lab%203.html
         k00 = v * cos(self._prev_angle)
@@ -97,9 +123,10 @@ class OdomHandler:
         return position, angle
 
     def _publish_tf_odom_base_link(self, timestamp: int, position: list, orientation: float) -> None:
-        x, y, z, w = tf_transformations.quaternion_from_euler(0, 0, orientation)
+        x, y, z, w = tf_transformations.quaternion_from_euler(
+            0, 0, orientation)
         q = Quaternion(x=x, y=y, z=z, w=w)
-        
+
         tf = TransformStamped()
         tf.header.stamp = timestamp
         tf.header.frame_id = self._odometry_frame
@@ -112,9 +139,10 @@ class OdomHandler:
 
     def _publish_odom_navmsg(self, timestamp: int, linear_vel: float, angular_vel: float, position: list,
                              orientation: float) -> None:
-        x, y, z, w = tf_transformations.quaternion_from_euler(0, 0, orientation)
+        x, y, z, w = tf_transformations.quaternion_from_euler(
+            0, 0, orientation)
         q = Quaternion(x=x, y=y, z=z, w=w)
-        
+
         msg = Odometry()
         msg.header.stamp = timestamp
         msg.header.frame_id = self._odometry_frame
@@ -125,9 +153,3 @@ class OdomHandler:
         msg.pose.pose.position.y = position[1]
         msg.pose.pose.orientation = q
         self._odometry_publisher.publish(msg)
-
-    def _reset_odometry(self):
-        self._prev_left_wheel_ticks = 0
-        self._prev_right_wheel_ticks = 0
-        self._prev_position = (0.0, 0.0)
-        self._prev_angle = 0.0
