@@ -58,7 +58,7 @@ class OdomHandler:
 
         if not isnan(right_wheel_ticks):
             if self._right_encoder_startup_offset is None:
-                self._right_encoder_startup_offset = left_wheel_ticks
+                self._right_encoder_startup_offset = right_wheel_ticks
         else:
             return
 
