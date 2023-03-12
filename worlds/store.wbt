@@ -10,10 +10,19 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/BrushedAluminium.proto"
 
 WorldInfo {
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        1000
+      ]
+    }
+  ]
 }
 Viewpoint {
-  orientation -0.08928492848109852 0.032980043793896734 0.995459953115884 2.442078467231992
-  position -2.3543354494726128 -3.4898413668974113 0.4184202598356397
+  orientation -0.08225491562240976 0.5419326887782714 0.8363869258241089 0.3646024192838412
+  position -6.974824884796137 -3.4302231949531374 1.2746015480551087
+  follow "storebot"
+  followType "Mounted Shot"
 }
 TexturedBackground {
 }
@@ -50,7 +59,9 @@ Robot {
     }
     Lidar {
       translation 0 0 0.12
-      rotation 0 0 1 -1.5707953071795862
+      rotation 0 1 0 0
+      horizontalResolution 360
+      fieldOfView 6.28
       numberOfLayers 1
       minRange 0.5
       maxRange 20
