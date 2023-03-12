@@ -1,39 +1,51 @@
 import rclpy
 from geometry_msgs.msg import Twist
+from .odom_handler import OdomHandler
 
 HALF_DISTANCE_BETWEEN_WHEELS = 0.35
 WHEEL_RADIUS = 0.11
 
+
 class StorebotDriver:
-    def init(self, webots_node, properties):
-        self.__robot = webots_node.robot
+    def init(self, webots_node, properties) -> None:
+        self._robot = webots_node.robot
 
-        self.__left_motor = self.__robot.getDevice('left_motor')
-        self.__right_motor = self.__robot.getDevice('right_motor')
+        self._left_motor = self._robot.getDevice('left_motor')
+        self._right_motor = self._robot.getDevice('right_motor')
 
-        self.__left_motor.setPosition(float('inf'))
-        self.__left_motor.setVelocity(0)
+        self._left_motor.setPosition(float('inf'))
+        self._left_motor.setVelocity(0)
 
-        self.__right_motor.setPosition(float('inf'))
-        self.__right_motor.setVelocity(0)
-
-        self.__target_twist = Twist()
+        self._right_motor.setPosition(float('inf'))
+        self._right_motor.setVelocity(0)
 
         rclpy.init(args=None)
-        self.__node = rclpy.create_node('storebot_driver')
-        self.__node.create_subscription(Twist, 'cmd_vel', self.__cmd_vel_callback, 1)
+        self._node = rclpy.create_node('storebot_driver')
+        self._node.create_subscription(
+            Twist, 'cmd_vel', self._cmd_vel_callback, 1)
 
-    def __cmd_vel_callback(self, twist):
-        forward_speed = twist.linear.x
-        angular_speed = twist.angular.z
+        self._odom_handler = OdomHandler(
+            self._robot, self._node, WHEEL_RADIUS, HALF_DISTANCE_BETWEEN_WHEELS)
 
-        command_motor_left = (forward_speed - angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
-        command_motor_right = (forward_speed + angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
+    def step(self) -> None:
+        rclpy.spin_once(self._node, timeout_sec=0)
 
-        self.__left_motor.setVelocity(command_motor_left)
-        self.__right_motor.setVelocity(command_motor_right)
+        self._odom_handler.publish_odometry()
 
-    def step(self):
-        rclpy.spin_once(self.__node, timeout_sec=0)
-        
-        
+    def _cmd_vel_callback(self, twist: Twist) -> None:
+        linear_vel = twist.linear.x
+        angular_vel = twist.angular.z
+
+        command_motor_left = self._calc_motor_velocity(
+            linear_vel, angular_vel, motor='left')
+        command_motor_right = self._calc_motor_velocity(
+            linear_vel, angular_vel, motor='right')
+
+        self._left_motor.setVelocity(command_motor_left)
+        self._right_motor.setVelocity(command_motor_right)
+
+    def _calc_motor_velocity(self, linear_vel: float, angular_vel: float, motor='left') -> float:
+        if motor == 'left':
+            angular_vel *= -1
+
+        return (linear_vel + angular_vel * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS

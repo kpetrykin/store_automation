@@ -12,8 +12,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.04884128150183199 0.4076485990377393 0.9118317547244267 0.26135551923442907
-  position -5.024690301500042 -2.4948333642436338 0.22106708170634576
+  orientation -0.08928492848109852 0.032980043793896734 0.995459953115884 2.442078467231992
+  position -2.3543354494726128 -3.4898413668974113 0.4184202598356397
 }
 TexturedBackground {
 }
@@ -42,7 +42,7 @@ FloorLight {
   pointLightCastShadows TRUE
 }
 Robot {
-  translation -3.737618596896735 -2.2188264623925864 0.2703307274267447
+  translation -3.73765 -2.21885 0.300331
   rotation -0.00175428527766837 0.0023365331619289516 -0.999995731538864 -0.35591785084433614
   children [
     DEF IMU InertialUnit {
@@ -58,7 +58,8 @@ Robot {
     DEF RIGHT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
         position 308.87798936822657
-        anchor -0.347 0 -0.18
+        axis 0 1 0
+        anchor 0 -0.35 -0.18
       }
       device [
         PositionSensor {
@@ -70,8 +71,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation -0.3469 0 -0.18
-        rotation -6.372106454270673e-07 0.4802631114099442 -0.8771244745293758 3.141594981118346
+        translation 0 -0.35 -0.18
+        rotation 7.850466295647709e-17 7.850466295647709e-17 -0.9999999999999999 1.5707953071795862
         children [
           DEF RIM_AND_TIRE_SHAPES Group {
             children [
@@ -221,7 +222,8 @@ Robot {
     DEF LEFT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
         position 277.31654721409797
-        anchor 0.353 0 -0.18
+        axis 0 1 0
+        anchor 0 0.35 -0.18
       }
       device [
         PositionSensor {
@@ -233,8 +235,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.35309999999998354 0 -0.18
-        rotation 1 0 0 0.8563936981961608
+        translation 0 0.35 -0.18
+        rotation 1.570089575055903e-16 0 1 1.5708
         children [
           DEF RIM_AND_TIRE_SHAPES Group {
             children [
@@ -385,11 +387,11 @@ Robot {
       jointParameters HingeJointParameters {
         position 5.03282728929293
         axis 0 0 1
-        anchor -0.352 -0.45 -0.19
+        anchor -0.45 -0.35 -0.19
         staticFriction 0.05
       }
       endPoint Solid {
-        translation -0.35193740395859774 -0.4501898518780544 -0.19
+        translation -0.45 -0.35 -0.19
         rotation -0.11353266579862648 0.7025347980250845 0.7025348328449708 3.36768995797664
         children [
           DEF casterWheelRim HingeJoint {
@@ -540,11 +542,11 @@ Robot {
       jointParameters HingeJointParameters {
         position 5.368061892019454
         axis 0 0 1
-        anchor 0.348 -0.45 -0.19
+        anchor -0.45 0.35 -0.19
         staticFriction 0.05
       }
       endPoint Solid {
-        translation 0.3481223988809945 -0.45015827985952517 -0.19
+        translation -0.45 0.35 -0.19
         rotation -0.23382667877494304 0.6875045626813658 0.6875045895013236 3.6009922659949125
         children [
           DEF casterWheelRim HingeJoint {
@@ -695,11 +697,11 @@ Robot {
       jointParameters HingeJointParameters {
         position 3.9296559051020146
         axis 0 0 1
-        anchor 0.348 0.45 -0.19
+        anchor 0.45 0.35 -0.19
         staticFriction 0.05
       }
       endPoint Solid {
-        translation 0.3478589646191168 0.4498579224812325 -0.19
+        translation 0.45 0.35 -0.19
         rotation 0.28010902294128076 0.6787999920108374 0.6788000486984134 2.595373102967388
         children [
           DEF casterWheelRim HingeJoint {
@@ -850,11 +852,11 @@ Robot {
       jointParameters HingeJointParameters {
         position -8.088899524342764
         axis 0 0 1
-        anchor -0.352 0.45 -0.19
+        anchor 0.45 -0.35 -0.19
         staticFriction 0.05
       }
       endPoint Solid {
-        translation -0.3520778595301928 0.4498157531721897 -0.19
+        translation 0.45 -0.35 -0.19
         rotation 0.13648905779674272 0.7004883399359851 0.7004904158626905 2.870290689455172
         children [
           DEF casterWheelRim HingeJoint {
@@ -1004,7 +1006,7 @@ Robot {
     DEF BODY Group {
       children [
         Transform {
-          translation -0.24 -0.01 -0.14
+          translation -0.01 -0.24 -0.14
           children [
             Shape {
               appearance BrushedAluminium {
@@ -1016,7 +1018,7 @@ Robot {
           ]
         }
         Transform {
-          translation 0.25 -0.01 -0.14
+          translation -0.01 0.24 -0.14
           children [
             Shape {
               appearance BrushedAluminium {
@@ -1031,11 +1033,11 @@ Robot {
           appearance BrushedAluminium {
           }
           geometry DEF robo_body Box {
-            size 0.8 1 0.1
+            size 1 0.8 0.1
           }
         }
         Transform {
-          translation -0.35 0.45 -0.09
+          translation 0.45 -0.35 -0.09
           children [
             Shape {
               appearance BrushedAluminium {
@@ -1047,7 +1049,7 @@ Robot {
           ]
         }
         Transform {
-          translation -0.35 -0.45 -0.09
+          translation -0.45 -0.35 -0.09
           children [
             Shape {
               appearance BrushedAluminium {
@@ -1059,7 +1061,7 @@ Robot {
           ]
         }
         Transform {
-          translation 0.35 -0.45 -0.09
+          translation -0.45 0.35 -0.09
           children [
             Shape {
               appearance BrushedAluminium {
@@ -1071,7 +1073,7 @@ Robot {
           ]
         }
         Transform {
-          translation 0.35 0.45 -0.09
+          translation 0.45 0.35 -0.09
           children [
             Shape {
               appearance BrushedAluminium {
