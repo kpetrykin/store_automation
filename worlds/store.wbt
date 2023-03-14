@@ -6,21 +6,20 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/Parquetry.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/tables/protos/Table.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/CardboardBox.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/lights/protos/FloorLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/BrushedAluminium.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/garden/protos/Wheelbarrow.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/bathroom/protos/Bathtube.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/chairs/protos/OfficeChair.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/WoodenBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/pallet/protos/WoodenPalletStack.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/MetalStorageBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/PlasticCrate.proto"
 
 WorldInfo {
-  contactProperties [
-    ContactProperties {
-      coulombFriction [
-        1000
-      ]
-    }
-  ]
 }
 Viewpoint {
-  orientation -0.08225491562240976 0.5419326887782714 0.8363869258241089 0.3646024192838412
-  position -6.974824884796137 -3.4302231949531374 1.2746015480551087
+  orientation 0.15846202508462734 0.0805920987262786 -0.9840704752348648 2.2105815204839496
+  position -7.033151454023305 2.5716302650331584 1.4244543363831728
   follow "storebot"
   followType "Mounted Shot"
 }
@@ -35,24 +34,96 @@ RectangleArena {
   wallHeight 0.6
 }
 Table {
+  translation -4.55 1.42 0
+  rotation 0 0 1 1.5708
+  name "cell"
+}
+Table {
+  translation -2.64 1.42 0
+  rotation 0 0 1 1.5708
+  name "cell(1)"
+}
+Table {
+  translation -0.69 1.42 0
+  rotation 0 0 1 1.5708
+  name "cell(2)"
+}
+Table {
+  translation 1.27 1.42 0
+  rotation 0 0 1 1.5708
+  name "cell(3)"
+}
+Table {
+  translation 3.23 1.42 0
+  rotation 0 0 1 1.5708
+  name "cell(4)"
+}
+Table {
+  translation 5.19 1.42 0
+  rotation 0 0 1 1.5708
+  name "cell(5)"
+}
+Table {
+  translation -4.55 -0.99 0
+  rotation 0 0 1 1.5708
+  name "cell(6)"
+}
+Table {
+  translation -2.61 -0.989994 0
+  rotation 0 0 1 1.5708
+  name "cell(7)"
+}
+Table {
+  translation -0.69 -0.989984 0
+  rotation 0 0 1 1.5708
+  name "cell(8)"
+}
+Table {
+  translation 1.27 -0.989975 0
+  rotation 0 0 1 1.5708
+  name "cell(9)"
+}
+Table {
+  translation 3.23 -0.98997 0
+  rotation 0 0 1 1.5708
+  name "cell(10)"
+}
+Table {
+  translation 5.19 -0.989963 0
+  rotation 0 0 1 1.5708
+  name "cell(11)"
+}
+Table {
+  translation -9.14 3.56 0
+  name "output_table"
+}
+Table {
+  translation -9.14 -3.77 0
+  name "input_table"
 }
 CardboardBox {
-  translation -2.23 1.98 0.34
+  translation -9.14 6.12 0.34
 }
 CardboardBox {
-  translation -2.37 1.15 0.2996075999999999
+  translation -4.93 1.22 0.33
+  name "cardboard box(2)"
+}
+CardboardBox {
+  translation -4.2 1.27 0.33
+  name "cardboard box(3)"
+}
+Wheelbarrow {
+  translation -3.23 0.989381 0.0344806
+  rotation -1 0 0 1.0472
+}
+CardboardBox {
+  translation -9.16 7.18 0.299608
   rotation 0.8580125975559425 0.12434965181997475 -0.4983488201326006 3.8093806475613195e-17
   name "cardboard box(1)"
   mass 1
 }
-FloorLight {
-  translation -4.28 3.1 0
-  bulbColor 1 1 0
-  pointLightCastShadows TRUE
-}
 Robot {
-  translation -3.73765 -2.21885 0.300331
-  rotation -0.00175428527766837 0.0023365331619289516 -0.999995731538864 -0.35591785084433614
+  translation -9 0 0.296498
   children [
     DEF IMU InertialUnit {
       name "imu"
@@ -65,6 +136,24 @@ Robot {
       numberOfLayers 1
       minRange 0.5
       maxRange 20
+      rotatingHead Solid {
+        children [
+          Transform {
+            translation 0 0 -0.035
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 0 0 0
+                }
+                geometry Cylinder {
+                  height 0.07
+                  radius 0.05
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
     DEF RIGHT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
@@ -78,7 +167,8 @@ Robot {
         }
         RotationalMotor {
           name "right_motor"
-          maxTorque 200
+          maxVelocity 50
+          maxTorque 100
         }
       ]
       endPoint Solid {
@@ -225,8 +315,6 @@ Robot {
           ]
         }
         physics DEF WHEEL_PHYSICS Physics {
-          density -1
-          mass 0.8
         }
       }
     }
@@ -242,7 +330,8 @@ Robot {
         }
         RotationalMotor {
           name "left_motor"
-          maxTorque 200
+          maxVelocity 50
+          maxTorque 100
         }
       ]
       endPoint Solid {
@@ -389,8 +478,6 @@ Robot {
           ]
         }
         physics DEF WHEEL_PHYSICS Physics {
-          density -1
-          mass 0.8
         }
       }
     }
@@ -399,7 +486,6 @@ Robot {
         position 5.03282728929293
         axis 0 0 1
         anchor -0.45 -0.35 -0.19
-        staticFriction 0.05
       }
       endPoint Solid {
         translation -0.45 -0.35 -0.19
@@ -554,7 +640,6 @@ Robot {
         position 5.368061892019454
         axis 0 0 1
         anchor -0.45 0.35 -0.19
-        staticFriction 0.05
       }
       endPoint Solid {
         translation -0.45 0.35 -0.19
@@ -709,7 +794,6 @@ Robot {
         position 3.9296559051020146
         axis 0 0 1
         anchor 0.45 0.35 -0.19
-        staticFriction 0.05
       }
       endPoint Solid {
         translation 0.45 0.35 -0.19
@@ -864,7 +948,6 @@ Robot {
         position -8.088899524342764
         axis 0 0 1
         anchor 0.45 -0.35 -0.19
-        staticFriction 0.05
       }
       endPoint Solid {
         translation 0.45 -0.35 -0.19
@@ -1106,4 +1189,71 @@ Robot {
   controllerArgs [
     ""
   ]
+}
+Bathtube {
+  translation -0.7 1.42 0
+  rotation 0 0 1 -1.5707953071795862
+}
+OfficeChair {
+  translation 1.69 1.38 0.29
+  rotation -2.3464099999870814e-06 0.9999999999944944 2.3464099999870814e-06 -1.5707953071795862
+}
+WoodenBox {
+  translation 2.82 1.23 0.3
+}
+WoodenBox {
+  translation 3.57 1.23 0.3
+  name "wooden box(3)"
+}
+WoodenBox {
+  translation -2.97 -0.83 0.3
+  name "wooden box(1)"
+}
+WoodenBox {
+  translation -2.24 -0.82 0.3
+  name "wooden box(2)"
+}
+WoodenPalletStack {
+  translation 5.17 1.47 0
+  palletNumber 4
+}
+WoodenPalletStack {
+  translation 5.17 -0.96 0
+  name "wooden pallet stack(2)"
+  palletNumber 4
+}
+WoodenPalletStack {
+  translation -4.45 -0.95 0
+  name "wooden pallet stack(1)"
+  palletNumber 4
+}
+WoodenPalletStack {
+  translation -9.05 3.51 0
+  rotation 0 0 1 -1.5707953071795862
+  name "wooden pallet stack(3)"
+  palletNumber 4
+}
+MetalStorageBox {
+  translation -0.69 -0.840002 0
+  rotation 0 0 1 1.5708
+}
+MetalStorageBox {
+  name "metal storage box(1)"
+  translation 3.2 -0.839994 0
+  rotation 0 0 1 1.5708
+}
+PlasticCrate {
+  translation 0.91 -0.8 0
+}
+PlasticCrate {
+  translation 1.61 -0.8 0
+  name "plastic crate(1)"
+}
+PlasticCrate {
+  translation -8.97 -4.22 0
+  name "plastic crate(2)"
+}
+PlasticCrate {
+  translation -8.97 -3.35 0
+  name "plastic crate(3)"
 }
