@@ -133,7 +133,7 @@ class OdomHandler:
         tf.child_frame_id = self._robot_base_frame
         tf.transform.translation.x = position[0]
         tf.transform.translation.y = position[1]
-        tf.transform.translation.z = 0.0
+        tf.transform.translation.z = 0.29
         tf.transform.rotation = q
         self._tf_broadcaster.sendTransform(tf)
 
@@ -151,5 +151,6 @@ class OdomHandler:
         msg.twist.twist.angular.z = angular_vel
         msg.pose.pose.position.x = position[0]
         msg.pose.pose.position.y = position[1]
+        msg.pose.pose.position.z = 0.29
         msg.pose.pose.orientation = q
         self._odometry_publisher.publish(msg)
