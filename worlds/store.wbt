@@ -14,12 +14,13 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/pallet/protos/WoodenPalletStack.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/MetalStorageBox.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/factory/containers/protos/PlasticCrate.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/appearances/protos/ReflectiveSurface.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.0202025701446428 0.996621995269698 0.07960185113549116 0.5207668038892924
-  position -21.05180514781254 -0.0802623197662109 9.32484742515726
+  orientation 0.18137336253253064 -0.7441672052014776 -0.6428988054633988 5.578260475665016
+  position -18.545970809596913 -7.037750257705631 9.25572658765263
   follow "storebot"
   followType "Mounted Shot"
 }
@@ -102,7 +103,8 @@ Table {
   name "input_table"
 }
 CardboardBox {
-  translation -9.01 0 1.06
+  translation -9.01 -3.41 1.0396076667120637
+  rotation 0.9869862055132012 0.1409980293590303 -0.07731614219245009 2.6876696607849107e-17
   mass 1
 }
 CardboardBox {
@@ -118,31 +120,322 @@ Wheelbarrow {
   rotation -1 0 0 1.0472
 }
 CardboardBox {
-  translation -9.16 7.18 0.299608
-  rotation 0.8580125975559425 0.12434965181997475 -0.4983488201326006 3.8093806475613195e-17
+  translation -9.16 7.18 0.2996076003911217
+  rotation -0.5701301922335219 -0.12669559827354826 -0.8117264251469672 2.2433067776339655e-17
   name "cardboard box(1)"
   mass 1
 }
 Robot {
-  translation -9 0 0.296498
+  translation -8.999440078350904 -0.00014948918176969326 0.27114962485004823
+  rotation 0.2725114130019777 0.9596565995633182 -0.06925850632402186 0.001435575298761536
   children [
+    Camera {
+      translation -1.16 0 2
+      rotation 0 1 0 0.523599
+      width 320
+      height 240
+      near 0.1
+      far 3
+    }
+    DEF BACK_ARM HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor -0.42 0 0.43
+      }
+      device [
+        RotationalMotor {
+          name "back_arm_yaw_motor"
+        }
+      ]
+      endPoint Solid {
+        translation -0.42000004944039976 -1.511442230959031e-07 0.449854122931793
+        rotation 7.580278697605417e-07 -2.0987697388120514e-08 0.9999999999997126 3.1415887134548846
+        children [
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              anchor 0 0 -0.02
+              minStop -1.57
+              maxStop 1.57
+            }
+            device [
+              RotationalMotor {
+                name "back_arm_pitch_motor"
+              }
+            ]
+            endPoint Solid {
+              translation 0 -2.117582368135751e-22 0.19999999999999982
+              rotation 1 0 0 0
+              children [
+                SliderJoint {
+                  jointParameters JointParameters {
+                    maxStop 0.4
+                  }
+                  device [
+                    LinearMotor {
+                      name "back_arm_slider_motor"
+                    }
+                  ]
+                  endPoint Solid {
+                    translation 0 0 0.1
+                    children [
+                      DEF SHOULDER_BALL HingeJoint {
+                        jointParameters HingeJointParameters {
+                          anchor 0 0 0.25
+                        }
+                        device [
+                          RotationalMotor {
+                            name "shoulder_front_motor"
+                          }
+                        ]
+                        endPoint Solid {
+                          translation 0 0 0.25
+                          rotation 1 0 0 0
+                          children [
+                            DEF SHOULDER_PISTON SliderJoint {
+                              jointParameters JointParameters {
+                                axis 1 0 0
+                                minStop -0.27
+                              }
+                              device [
+                                LinearMotor {
+                                  name "gripper_back_motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                translation 0.1 0 0
+                                children [
+                                  Solid {
+                                    translation -0.15 0 -0.1
+                                    children [
+                                      Shape {
+                                        appearance ReflectiveSurface {
+                                        }
+                                        geometry DEF GRIPPER_BOX Box {
+                                          size 0.01 0.5 0.5
+                                        }
+                                      }
+                                    ]
+                                    boundingObject USE GRIPPER_BOX
+                                    physics Physics {
+                                    }
+                                  }
+                                  Shape {
+                                    appearance BrushedAluminium {
+                                    }
+                                    geometry DEF SHOULDER_PISTON Box {
+                                      size 0.3 0.03 0.03
+                                    }
+                                  }
+                                ]
+                                boundingObject USE SHOULDER_PISTON
+                                physics Physics {
+                                }
+                              }
+                            }
+                            Shape {
+                              appearance BrushedAluminium {
+                              }
+                              geometry DEF SHOULDER Sphere {
+                                radius 0.05
+                              }
+                            }
+                          ]
+                          boundingObject USE SHOULDER
+                          physics Physics {
+                          }
+                        }
+                      }
+                      Shape {
+                        appearance BrushedAluminium {
+                        }
+                        geometry DEF PISTON Box {
+                          size 0.04 0.06 0.5
+                        }
+                      }
+                    ]
+                    boundingObject USE PISTON
+                    physics Physics {
+                    }
+                  }
+                }
+                Shape {
+                  appearance BrushedAluminium {
+                  }
+                  geometry DEF RIGHT_BOTTOM_BONE Box {
+                    size 0.06 0.08 0.5
+                  }
+                }
+              ]
+              boundingObject USE RIGHT_BOTTOM_BONE
+              physics Physics {
+              }
+            }
+          }
+        ]
+        name "solid(1)"
+        boundingObject USE RIGHT_BOTTOM_BONE
+        physics Physics {
+        }
+      }
+    }
+    DEF FRONT_ARM HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.42 0 0.43
+      }
+      device [
+        RotationalMotor {
+          name "front_arm_yaw_motor"
+        }
+      ]
+      endPoint Solid {
+        translation 0.4199999038716063 -1.5027420703765463e-07 0.44985413286644066
+        rotation 0.020249342044878986 -0.7586192722990945 0.651219443692479 2.0518200967382502e-06
+        children [
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              anchor 0 0 -0.02
+              minStop -1.57
+              maxStop 1.57
+            }
+            device [
+              RotationalMotor {
+                name "front_arm_pitch_motor"
+              }
+            ]
+            endPoint Solid {
+              translation 0 -4.235164736271502e-22 0.20000000000000012
+              rotation 1 0 0 0
+              children [
+                SliderJoint {
+                  jointParameters JointParameters {
+                    maxStop 0.4
+                  }
+                  device [
+                    LinearMotor {
+                      name "front_arm_slider_motor"
+                    }
+                  ]
+                  endPoint Solid {
+                    translation 0 0 0.1
+                    children [
+                      DEF SHOULDER_BALL HingeJoint {
+                        jointParameters HingeJointParameters {
+                          anchor 0 0 0.25
+                        }
+                        device [
+                          RotationalMotor {
+                            name "shoulder_front_motor"
+                          }
+                        ]
+                        endPoint Solid {
+                          translation 0 0 0.25
+                          rotation 1 0 0 0
+                          children [
+                            DEF SHOULDER_PISTON SliderJoint {
+                              jointParameters JointParameters {
+                                axis 1 0 0
+                                minStop -0.27
+                              }
+                              device [
+                                LinearMotor {
+                                  name "gripper_front_motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                translation 0.1 0 0
+                                children [
+                                  Solid {
+                                    translation -0.15 0 -0.1
+                                    children [
+                                      Shape {
+                                        appearance ReflectiveSurface {
+                                        }
+                                        geometry DEF GRIPPER_BOX Box {
+                                          size 0.01 0.5 0.5
+                                        }
+                                      }
+                                    ]
+                                    boundingObject USE GRIPPER_BOX
+                                    physics Physics {
+                                    }
+                                  }
+                                  Shape {
+                                    appearance BrushedAluminium {
+                                    }
+                                    geometry DEF SHOULDER_PISTON Box {
+                                      size 0.3 0.03 0.03
+                                    }
+                                  }
+                                ]
+                                boundingObject USE SHOULDER_PISTON
+                                physics Physics {
+                                }
+                              }
+                            }
+                            Shape {
+                              appearance BrushedAluminium {
+                              }
+                              geometry DEF SHOULDER Sphere {
+                                radius 0.05
+                              }
+                            }
+                          ]
+                          boundingObject USE SHOULDER
+                          physics Physics {
+                          }
+                        }
+                      }
+                      Shape {
+                        appearance BrushedAluminium {
+                        }
+                        geometry DEF PISTON Box {
+                          size 0.04 0.06 0.5
+                        }
+                      }
+                    ]
+                    boundingObject USE PISTON
+                    physics Physics {
+                    }
+                  }
+                }
+                Shape {
+                  appearance BrushedAluminium {
+                  }
+                  geometry DEF RIGHT_BOTTOM_BONE Box {
+                    size 0.06 0.08 0.5
+                  }
+                }
+              ]
+              boundingObject USE RIGHT_BOTTOM_BONE
+              physics Physics {
+              }
+            }
+          }
+        ]
+        boundingObject USE RIGHT_BOTTOM_BONE
+        physics Physics {
+        }
+      }
+    }
     DEF REAR_CW HingeJoint {
       jointParameters HingeJointParameters {
+        position 0.011564863686039784
         axis 0 0 1
         anchor -0.35 0 -0.19
       }
       endPoint Solid {
-        translation -0.35 0 -0.19
-        rotation 0.28010902294128076 0.6787999920108374 0.6788000486984134 2.595373102967388
+        translation -0.3499997928050748 1.3489971561799052e-07 -0.1897662189965405
+        rotation 0.2758774773014341 0.6796648969306262 0.6796670106736665 2.6032275144140873
         children [
           DEF casterWheelRim HingeJoint {
             jointParameters HingeJointParameters {
-              position -605.8817703155696
+              position -605.8785840296995
               anchor 0 -0.0521014 0.012843
             }
             endPoint Solid {
               translation 0 -0.0521014 0.012843
-              rotation -1 0 0 2.695980826329309
+              rotation -1 0 0 2.69279454045918
               children [
                 DEF CASTER_WHEEL_RIM_SHAPE Shape {
                   appearance PBRAppearance {
@@ -281,21 +574,22 @@ Robot {
     }
     DEF FRONT_CW HingeJoint {
       jointParameters HingeJointParameters {
+        position 0.024887506833929738
         axis 0 0 1
         anchor 0.35 0 -0.19
       }
       endPoint Solid {
-        translation 0.35 0 -0.19
-        rotation 0.28010902294128076 0.6787999920108374 0.6788000486984134 2.595373102967388
+        translation 0.35000020262564946 1.343078796151302e-07 -0.18977194871005687
+        rotation 0.2710079732539863 0.6806437635217097 0.6806458297909196 2.6122890374447034
         children [
           DEF casterWheelRim HingeJoint {
             jointParameters HingeJointParameters {
-              position -605.8817703155696
+              position -605.8777354831848
               anchor 0 -0.0521014 0.012843
             }
             endPoint Solid {
               translation 0 -0.0521014 0.012843
-              rotation -1 0 0 2.695980826329309
+              rotation -0.9999999999999999 0 0 2.691945993944477
               children [
                 DEF CASTER_WHEEL_RIM_SHAPE Shape {
                   appearance PBRAppearance {
@@ -464,7 +758,7 @@ Robot {
     }
     DEF RIGHT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
-        position 308.87798936822657
+        position 308.8779893587276
         axis 0 1 0
         anchor 0 -0.35 -0.18
       }
@@ -479,8 +773,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 -0.35 -0.18
-        rotation 7.850466295647709e-17 7.850466295647709e-17 -0.9999999999999999 1.5707953071795862
+        translation 8.880098655321064e-08 -0.3499994930681116 -0.1796057626805929
+        rotation 1.9613196454720067e-08 -3.732149437682358e-09 -0.9999999999999997 1.570795307185719
         children [
           DEF RIM_AND_TIRE_SHAPES Group {
             children [
@@ -627,7 +921,7 @@ Robot {
     }
     DEF LEFT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
-        position 277.31654721409797
+        position 277.316547200478
         axis 0 1 0
         anchor 0 0.35 -0.18
       }
@@ -642,8 +936,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0 0.35 -0.18
-        rotation 1.570089575055903e-16 0 1 1.5708
+        translation 8.189638210333782e-08 0.35000049278310635 -0.17961983762268988
+        rotation -4.648604320669611e-09 -1.8977914487548153e-08 0.9999999999999996 1.5707999999944247
         children [
           DEF RIM_AND_TIRE_SHAPES Group {
             children [
@@ -791,6 +1085,30 @@ Robot {
     DEF BODY Group {
       children [
         Transform {
+          translation 0.42 0 0.42
+          children [
+            Shape {
+              appearance BrushedAluminium {
+              }
+              geometry Sphere {
+                radius 0.06
+              }
+            }
+          ]
+        }
+        Transform {
+          translation -0.42 0 0.42
+          children [
+            Shape {
+              appearance BrushedAluminium {
+              }
+              geometry Sphere {
+                radius 0.05
+              }
+            }
+          ]
+        }
+        Transform {
           translation -0.37 0 0.21
           children [
             Shape {
@@ -919,8 +1237,8 @@ Bathtube {
   rotation 0 0 1 -1.5707953071795862
 }
 OfficeChair {
-  translation 1.69 1.38 0.29
-  rotation -2.3464099999870814e-06 0.9999999999944944 2.3464099999870814e-06 -1.5707953071795862
+  translation 1.6857186139765201 1.3803261232496908 0.2587362273526206
+  rotation -0.00010032442798484587 -0.9999999077759212 0.0004175920956241237 1.5481016799188234
 }
 WoodenBox {
   translation 2.82 1.23 0.3
