@@ -1,6 +1,7 @@
 import rclpy
 from geometry_msgs.msg import Twist
 from .odom_handler import OdomHandler
+from .lidar_republisher import LidarRepublisher
 
 HALF_DISTANCE_BETWEEN_WHEELS = 0.35
 WHEEL_RADIUS = 0.11
@@ -26,6 +27,8 @@ class StorebotDriver:
 
         self._odom_handler = OdomHandler(
             self._robot, self._node, WHEEL_RADIUS, HALF_DISTANCE_BETWEEN_WHEELS)
+        
+        self._lidar_republisher = LidarRepublisher(self._robot, self._node)
 
     def step(self) -> None:
         rclpy.spin_once(self._node, timeout_sec=0)
