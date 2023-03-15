@@ -94,7 +94,7 @@
     <joint name="base_joint" type="fixed">
         <parent link="base_link" />
         <child link="base_footprint" />
-        <origin xyz="0.0 0.0 0.5" rpy="0 0 0" />
+        <origin xyz="0.0 0.0 -0.29" rpy="0 0 0" />
     </joint>
 
     <joint name="left_motor" type="fixed">
