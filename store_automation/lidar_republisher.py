@@ -14,7 +14,7 @@ class LidarRepublisher:
             LaserScan, '/storebot/lidar', self._laser_scan_callback, 1)
     
     def _laser_scan_callback(self, msg: LaserScan) -> None:
-        timestamp = Time(seconds=self._robot.getTime()).to_msg() #self._ros_node.get_clock().now().to_msg() 
+        timestamp = Time(seconds=self._robot.getTime()).to_msg()
         
         timed_msg = msg
         timed_msg.header.stamp = timestamp

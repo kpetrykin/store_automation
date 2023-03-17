@@ -19,8 +19,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.18137336253253064 -0.7441672052014776 -0.6428988054633988 5.578260475665016
-  position -18.545970809596913 -7.037750257705631 9.25572658765263
+  orientation 0.196895780551781 -0.5477674055422895 -0.8131315521035782 5.468865400632529
+  position -13.292373993116518 -5.232357168703085 4.686136897101223
   follow "storebot"
   followType "Mounted Shot"
 }
@@ -141,10 +141,17 @@ Robot {
       jointParameters HingeJointParameters {
         axis 0 0 1
         anchor -0.42 0 0.43
+        minStop -1.57
+        maxStop 1.57
       }
       device [
         RotationalMotor {
           name "back_arm_yaw_motor"
+          acceleration 1
+          maxVelocity 100
+          minPosition -1.57
+          maxPosition 1.57
+          maxTorque 1000
         }
       ]
       endPoint Solid {
@@ -160,6 +167,7 @@ Robot {
             device [
               RotationalMotor {
                 name "back_arm_pitch_motor"
+                maxTorque 1000
               }
             ]
             endPoint Solid {
@@ -173,6 +181,7 @@ Robot {
                   device [
                     LinearMotor {
                       name "back_arm_slider_motor"
+                      maxForce 100
                     }
                   ]
                   endPoint Solid {
@@ -184,7 +193,7 @@ Robot {
                         }
                         device [
                           RotationalMotor {
-                            name "shoulder_front_motor"
+                            name "back_shoulder_motor"
                           }
                         ]
                         endPoint Solid {
@@ -198,7 +207,8 @@ Robot {
                               }
                               device [
                                 LinearMotor {
-                                  name "gripper_back_motor"
+                                  name "back_gripper_motor"
+                                  maxForce 50
                                 }
                               ]
                               endPoint Solid {
@@ -282,10 +292,17 @@ Robot {
       jointParameters HingeJointParameters {
         axis 0 0 1
         anchor 0.42 0 0.43
+        minStop -1.57
+        maxStop 1.57
       }
       device [
         RotationalMotor {
           name "front_arm_yaw_motor"
+          acceleration 1
+          maxVelocity 100
+          minPosition -1.57
+          maxPosition 1.57
+          maxTorque 1000
         }
       ]
       endPoint Solid {
@@ -301,6 +318,7 @@ Robot {
             device [
               RotationalMotor {
                 name "front_arm_pitch_motor"
+                maxTorque 1000
               }
             ]
             endPoint Solid {
@@ -314,6 +332,7 @@ Robot {
                   device [
                     LinearMotor {
                       name "front_arm_slider_motor"
+                      maxForce 100
                     }
                   ]
                   endPoint Solid {
@@ -325,7 +344,7 @@ Robot {
                         }
                         device [
                           RotationalMotor {
-                            name "shoulder_front_motor"
+                            name "front_shoulder_motor"
                           }
                         ]
                         endPoint Solid {
@@ -339,7 +358,8 @@ Robot {
                               }
                               device [
                                 LinearMotor {
-                                  name "gripper_front_motor"
+                                  name "front_gripper_motor"
+                                  maxForce 50
                                 }
                               ]
                               endPoint Solid {
