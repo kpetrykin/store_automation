@@ -165,6 +165,9 @@ Robot {
               maxStop 1.57
             }
             device [
+              PositionSensor {
+                name "back_pitch_encoder"
+              }
               RotationalMotor {
                 name "back_arm_pitch_motor"
                 maxTorque 1000

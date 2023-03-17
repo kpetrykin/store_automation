@@ -1,10 +1,20 @@
+import threading
 from std_msgs.msg import Float32
 
+ENCODER_TIMESTEP = 50  # ms
 
 class ArmController:
     def __init__(self, robot, ros_node) -> None:
         self._robot = robot
         self._ros_node = ros_node
+        
+        self._back_pitch_encoder = self._robot.getDevice('back_pitch_encoder')
+        self._back_pitch_encoder.enable(ENCODER_TIMESTEP)
+        
+        self._pitch_publisher = self._ros_node.create_publisher(
+            Float32, '/cur_pitch_angle', 1)
+        
+        self._pitch_pub_timer = self._ros_node.create_timer(0.2, self._pitch_pub_timer_callback)
         
         self._motors = {
             "yaw": {
@@ -104,5 +114,13 @@ class ArmController:
         for _, dev in self._motors["grippers"].items():
             dev["device"].setPosition(msg.data * dev["coeff"])
             dev["device"].setVelocity(0.5)
+            
+    def _pitch_pub_timer_callback(self):
+        msg = Float32()
+        
+        cur_pitch = self._back_pitch_encoder.getValue()
+        msg.data = cur_pitch
+        
+        self._pitch_publisher.publish(msg)
     
     
