@@ -25,6 +25,7 @@ Viewpoint {
   followType "Mounted Shot"
 }
 TexturedBackground {
+  texture "mars"
 }
 TexturedBackgroundLight {
 }
@@ -132,10 +133,12 @@ Robot {
     Camera {
       translation -1.16 0 2
       rotation 0 1 0 0.523599
+      fieldOfView 1.57
       width 320
       height 240
+      projection "spherical"
       near 0.1
-      far 3
+      noise 0.04
     }
     DEF BACK_ARM HingeJoint {
       jointParameters HingeJointParameters {
