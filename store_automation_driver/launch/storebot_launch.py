@@ -71,7 +71,7 @@ def generate_launch_description():
                                             description='Absolute path to robot urdf file'),
         webots,
         storebot_driver,
-        footprint_publisher,
+        # footprint_publisher,
         map_publisher,
         joint_state_publisher_node,
         robot_state_publisher_node,
