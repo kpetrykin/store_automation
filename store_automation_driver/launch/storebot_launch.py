@@ -34,11 +34,10 @@ def generate_launch_description():
         ],
     )
     
-    footprint_publisher = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
+    arm_action_server_node = Node(
+        package='store_automation',
+        executable='arm_control_action_server',
         output='screen',
-        arguments=['0', '0', '-0.29', '0', '0', '0', 'base_link', 'base_footprint'],
         parameters=[{'use_sim_time': True}]
     )
     
@@ -71,7 +70,7 @@ def generate_launch_description():
                                             description='Absolute path to robot urdf file'),
         webots,
         storebot_driver,
-        # footprint_publisher,
+        arm_action_server_node,
         map_publisher,
         joint_state_publisher_node,
         robot_state_publisher_node,

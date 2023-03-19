@@ -23,6 +23,7 @@ setup(
     entry_points={
         'console_scripts': [
             'storebot_driver = store_automation.storebot_driver:main',
+            'arm_control_action_server = store_automation.arm_control_action_server:main'
         ],
     },
 )
