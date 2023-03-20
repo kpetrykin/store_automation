@@ -1,0 +1,31 @@
+{
+  "name": "store_automation_web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "pinia": "^2.0.32",
+    "roslib": "^1.3.0",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6",
+    "vue-split-layout": "^0.0.16",
+    "vue3-grid-layout-next": "^1.0.5",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.2.0",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "@vue/eslint-config-prettier": "^7.1.0",
+    "eslint": "^8.34.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "naive-ui": "^2.34.3",
+    "prettier": "^2.8.4",
+    "vite": "^4.1.4"
+  }
+}
