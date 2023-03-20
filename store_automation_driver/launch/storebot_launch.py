@@ -41,6 +41,13 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
     
+    arm_action_client_node = Node(
+        package='store_automation',
+        executable='arm_control_action_client',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
+    
     map_publisher = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -53,6 +60,18 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         parameters=[{'use_sim_time': True, 'robot_description': Command(['xacro ', LaunchConfiguration('model')])}]
+    )
+    
+    rosbridge_node = Node(
+        package='rosbridge_server',
+        executable='rosbridge_websocket',
+        parameters=[{'use_sim_time': True}]
+    )
+    
+    image_republisher_node = Node(
+        package='store_automation',
+        executable='image_republisher',
+        parameters=[{'use_sim_time': True}]
     )
     
     joint_state_publisher_node = Node(
@@ -71,9 +90,12 @@ def generate_launch_description():
         webots,
         storebot_driver,
         arm_action_server_node,
+        arm_action_client_node,
         map_publisher,
         joint_state_publisher_node,
         robot_state_publisher_node,
+        rosbridge_node,
+        image_republisher_node,
         launch.actions.RegisterEventHandler(
             event_handler=launch.event_handlers.OnProcessExit(
                 target_action=webots,
