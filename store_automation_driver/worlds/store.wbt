@@ -136,9 +136,8 @@ Robot {
       fieldOfView 1.57
       width 320
       height 240
-      projection "spherical"
       near 0.1
-      noise 0.04
+      noise 0.02
     }
     DEF BACK_ARM HingeJoint {
       jointParameters HingeJointParameters {
