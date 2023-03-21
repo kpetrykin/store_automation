@@ -1,6 +1,8 @@
 # Store automation in vacuum with ROS2 and Webots
 This is an example project realizing manual and atonomous control of a robot which operates some goods on an improvising store.
 
+![](store_automation_web/src/assets/webots_view.png)
+
 ## Docker
 Everything runs inside an awesome [memristor mep3 docker](https://github.com/memristor/mep3/tree/main/docker) which holds all needed for Webots and ROS2 development.
 
