@@ -4,16 +4,25 @@ import 'roslib/build/roslib';
 export default {
   data () {
     return {
+      arm_operations: ['load_left', 'unload_left', 'standby', 'unload_right', 'load_right'],
+      nav_pose_operations: ['goto_cell', 'goto_coords'],
       ros: null,
       ros_connected: false,
       manual_control_enabled: true,
       cmd_vel_publisher: undefined,
       arm_operation_publisher: undefined,
+      navigate_to_pose_operation_publisher: undefined,
+      navigate_to_pose_operation_listener: undefined,
       lin_vel: 0.0,
       ang_vel: 0.0,
-      vel_coeff: 0.5,
+      vel_coeff: 0.8,
       is_arm_operation_in_process: false,
-      last_arm_operation_result: false
+      last_arm_operation_result: false,
+      queue_operation_in_process: false,
+      queue_execution: true,
+      cur_operation_status: '',
+      cur_operation: undefined,
+      cur_operation_id: undefined,
     }
   },
   mounted() {
@@ -78,9 +87,99 @@ export default {
       console.log('Arm operation result: ', message);
       this.is_arm_operation_in_process = false;
       this.last_arm_operation_result = message.data;
+
+      if (this.cur_operation) {
+        if (message.data) {
+          this.cur_operation.status = 'Success';
+          setTimeout(() => {
+            this.delOperationFromQueue(this.cur_operation_id);
+            this.cur_operation_id = undefined;
+            this.cur_operation = undefined;
+          }, 1000)
+        } else {
+          this.cur_operation.status = 'Failed';
+          this.queue_execution = false;
+        }
+      }
     });
+
+    // ----------------------- COMMAND_QUEUE-------------------
+
+    this.navigate_to_pose_operation_publisher = new ROSLIB.Topic({
+      ros : ros,
+      name : '/call_navigate_to_pose',
+      messageType : 'geometry_msgs/PoseStamped'
+    });
+
+    var navigate_to_pose_operation_listener = new ROSLIB.Topic({
+      ros : ros,
+      name : '/navigate_to_pose_result',
+      messageType : 'std_msgs/Bool'
+    });
+
+    navigate_to_pose_operation_listener.subscribe((message) => {
+      console.log('Nav to pose operation result: ', message);
+      if (this.cur_operation) {
+        if (message.data) {
+          this.cur_operation.status = 'Success';
+          setTimeout(() => {
+            this.delOperationFromQueue(this.cur_operation_id);
+            this.cur_operation_id = undefined;
+            this.cur_operation = undefined;
+          }, 1000)
+        } else {
+          this.cur_operation.status = 'Failed';
+          this.queue_execution = false;
+        }
+      }
+    });
+
+    setInterval(this.process_operation_queue, 1000);
   },
   methods: {
+    process_operation_queue() {
+      if (Object.keys(this.operation_queue).length && this.queue_execution){
+        let first_op_in_queue = this.operation_queue[Object.keys(this.operation_queue)[0]];
+        // console.log('First op in queue: ', first_op_in_queue);
+
+        if (first_op_in_queue.status != 'Executing'
+            && first_op_in_queue.status != 'Success'
+            && first_op_in_queue.status != 'Failed') {
+          if (this.arm_operations.includes(first_op_in_queue.operation)) {
+            this.publish_arm_operation(first_op_in_queue.operation);
+          } else {
+            this.publish_nav_to_pose_operation(this.inputed_coords)
+          }
+          this.cur_operation_id = Object.keys(this.operation_queue)[0];
+          this.cur_operation = first_op_in_queue;
+          this.cur_operation.status = 'Executing';
+        }
+      }
+      // if (this.adding_operation == 'goto_coords') {
+      //   this.publish_nav_to_pose_operation(this.inputed_coords)
+      // }
+    },
+    publish_nav_to_pose_operation(pose) {
+      if (this.ros_connected) {
+        var pose = new ROSLIB.Message({
+          header: {stamp: {sec: 0}, frame_id: 'map'},
+          pose: {
+            position : {
+              x : pose.x,
+              y : pose.y,
+              z : 0.0
+            },
+            orientation : {
+              x : 0.0,
+              y : 0.0,
+              z : pose.yaw,
+              w : 1.0
+            }
+        }
+        });
+        this.navigate_to_pose_operation_publisher.publish(pose);
+      }
+    },
     publish_cmd_vel() {
       if (this.ros_connected && this.manual_control_enabled) {
         var twist = new ROSLIB.Message({
@@ -140,7 +239,7 @@ export default {
     },
     "control_buttons.load_left": function(val) {
       if (val) {
-        this.publish_arm_operation('load_lft')
+        this.publish_arm_operation('load_left')
       }
     },
     "control_buttons.unload_left": function(val) {

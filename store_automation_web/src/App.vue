@@ -67,7 +67,10 @@ import { RouterLink, RouterView } from 'vue-router'
             <td class="key_button_table_cell" colspan="5"></td>
           </tr>
           <tr class="key_button_table_row" >
-            <td class="key_button_table_cell"></td>
+            <td class="key_button_table_cell"><n-button
+                class="key_but"
+                @mousedown="queue_execution = !queue_execution"
+              >{{ queue_execution ? 'Pause' : 'Resume' }}</n-button></td>
             <td class="key_button_table_cell"></td>
             <td class="key_button_table_cell">
               <n-button 
@@ -107,33 +110,64 @@ import { RouterLink, RouterView } from 'vue-router'
               
       </div>
 
-      <n-table v-if="item.i === '0'" :bordered="true" :single-line="false">
+      <div v-if="item.i === '0'">
+        <n-form>
+        <n-select
+          placeholder="Select operation"
+          :options="operations_select"
+          v-model:value="adding_operation"
+        ></n-select>
+        <n-select
+        v-if="adding_operation == 'goto_cell'"
+          placeholder="Select cell"
+          :options="cells"
+          @update:value="cellUpdateValue"
+        ></n-select>
+        <n-input-number 
+          v-if="adding_operation == 'goto_coords'"
+          v-model:value="inputed_coords.x"
+          placeholder="Select X"
+        ></n-input-number>
+        <n-input-number 
+          v-if="adding_operation == 'goto_coords'"
+          v-model:value="inputed_coords.y"
+          placeholder="Select Y"
+        ></n-input-number>
+        <n-input-number 
+          v-if="adding_operation == 'goto_coords'"
+          v-model:value="inputed_coords.yaw"
+          placeholder="Select YAW"
+        ></n-input-number>
+        <n-button
+          v-if="adding_operation != ''"
+          @mousedown="addOperationToQueue()"
+        >Add operation to queue</n-button>
+        </n-form>
+        <n-table :bordered="true" :single-line="false">
           <thead>
             <tr>
-              <th>Abandon</th>
-              <th>Abormal</th>
-              <th>Abolish</th>
-              <th>...</th>
-              <th>It's hard to learn words</th>
+              <th>ID</th>
+              <th>Operation</th>
+              <th>Coordinates</th>
+              <th>Status</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>放弃</td>
-              <td>反常的</td>
-              <td>彻底废除</td>
-              <td>...</td>
-              <td><n-button class="key_but">delete</n-button></td>
-            </tr>
-            <tr>
-              <td>...</td>
-              <td>...</td>
-              <td>...</td>
-              <td>...</td>
-              <td>...</td>
+            <tr v-for="(op, id, index) in operation_queue">
+              <td>{{ id }}</td>
+              <td>{{ op.operation }}</td>
+              <td>{{ op.coordinates }}</td>
+              <td>{{ op.status }}</td>
+              <td><n-button 
+                class="key_but"
+                @mousedown="delOperationFromQueue(id)"
+              >DEL</n-button></td>
             </tr>
           </tbody>
         </n-table>
+          
+      </div>
       
 
     </grid-item>
@@ -145,13 +179,60 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <script>
 import { GridLayout, GridItem } from 'vue3-grid-layout-next';
-import { NButton, NTable } from 'naive-ui'
+import { NButton, NTable, NInputNumber, NForm, NSelect } from 'naive-ui'
 import ros from './mixins/ros.js';
+import { times } from 'lodash';
 
 
 export default {
   mixins: [ros],
-  components: {GridLayout, GridItem, NTable, NButton},
+  components: {GridLayout, GridItem, NTable, NButton, NInputNumber, NForm,
+               NSelect},
+  data () {
+    return {
+      operations_select: [
+        {label: 'goto_coords', value: "goto_coords"},
+        {label: 'goto_cell', value: "goto_cell"},
+        {label: 'load_left', value: "load_left"},
+        {label: 'unload_left', value: "unload_left"},
+        {label: 'load_right', value: "load_right"},
+        {label: 'unload_right', value: "unload_right"},
+        {label: 'standby', value: "standby"}
+      ],
+      cells: [
+        {label: 'input', value: {x: 0, y: 0, yaw: 0}},
+        {label: 'output', value: {x: 0, y: 0, yaw: 0}},
+        {label: '0', value: {x: 0, y: 0, yaw: 0}},
+        {label: '1', value: {x: 0, y: 0, yaw: 0}},
+        {label: '2', value: {x: 0, y: 0, yaw: 0}},
+        {label: '3', value: {x: 0, y: 0, yaw: 0}},
+        {label: '4', value: {x: 0, y: 0, yaw: 0}}
+      ],
+      adding_operation: '',
+      inputed_coords: {
+        x: 6, y: 6, yaw: 1.57
+      },
+      operation_counter: 0,
+      operation_queue: {
+
+      },
+      layout: [
+        {"x":0,"y":0,"w":11,"h":23,"i":"0", static: false},
+        // {"x":30,"y":0,"w":10,"h":23,"i":"1", static: false},
+        {"x":27,"y":33,"w":13,"h":13,"i":"3", static: false},
+      ],
+      control_buttons: {
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+        load_left: false,
+        load_right: false,
+        unload_left: false,
+        unload_right: false
+      }
+   }
+  },
   mounted() {
     document.addEventListener('keydown', (e) => {
       switch (e.code) {
@@ -191,27 +272,32 @@ export default {
       }
     });
   },
-  data () {
-    return {
-      layout: [
-        {"x":0,"y":0,"w":20,"h":23,"i":"0", static: false},
-        {"x":30,"y":0,"w":10,"h":23,"i":"1", static: false},
-        // {"x":0,"y":0,"w":20,"h":23,"i":"2", static: false},
-        {"x":27,"y":33,"w":13,"h":13,"i":"3", static: false},
-      ],
-      control_buttons: {
-        up: false,
-        down: false,
-        left: false,
-        right: false,
-        load_left: false,
-        load_right: false,
-        unload_left: false,
-        unload_right: false
-      }
-   }
-  },
   methods: {
+    delOperationFromQueue(id) {
+      if (this.operation_queue[id]) {
+        delete this.operation_queue[id]
+      }
+
+    },
+    addOperationToQueue() {
+      this.operation_counter += 1;
+      this.operation_queue[this.operation_counter] = {
+        operation: this.adding_operation,
+        coordinates: this.adding_operation == 'goto_coords' 
+                      || this.adding_operation == 'goto_cell' ? this.inputed_coords : '---',
+        status: 'added'
+      }
+
+         
+      this.adding_operation = ''
+    },
+    cellUpdateValue(value, option) {
+      console.log('cell_coords: ', value)
+      this.inputed_coords = value;
+    },
+    handleUpdateValue(value, option) {
+      this.adding_operation = option.label;
+    },
     control_button_down(button) {
       this.control_buttons[button] = true;
     },
