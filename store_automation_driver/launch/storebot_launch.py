@@ -48,6 +48,13 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
     
+    navigate_to_pose_action_client_node = Node(
+        package='store_automation',
+        executable='navigate_to_pose_action_client',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
+    
     map_publisher = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -91,6 +98,7 @@ def generate_launch_description():
         storebot_driver,
         arm_action_server_node,
         arm_action_client_node,
+        navigate_to_pose_action_client_node,
         map_publisher,
         joint_state_publisher_node,
         robot_state_publisher_node,
